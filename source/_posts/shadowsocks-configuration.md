@@ -22,9 +22,10 @@ Shadowsocks server的安装和配置非常简单，没有复杂的配置项，�
 sudo apt-get update
 sudo apt-get install python-pip
 sudo pip install shadowsocks
-```
 
 sudo ssserver -p 8388 -k password -m aes-256-cfb -d start
+```
+
 上面的命令安装并启动好了在8388端口监听的Server，客户端配置好相应的端口号、密码和加密方式就可以了。
 
 ### Client
