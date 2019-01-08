@@ -2,6 +2,7 @@
 title: Wi-Fi Direct 协议详解
 date: 2016-12-23 05:48:46
 tags:
+categories: wifi
 ---
  
 理论上，Wi-Fi Direct属于纯软件协议，也就是说不需要额外的硬件支持，只要支持802.11g、n或者ac的设备都可以实现Wi-Fi Direct的基本功能。但一些高级功能，比如Wi-Fi Direct电源管理需要非常精细的定时管理和状态切换，Concurrent模式需要对多个源MAC地址进行高效的过滤，这些都靠软件实现会比较费劲。所以不要太指望老设备通过软件升级来实现Wi-Fi Direct，就算能实现也是效率低下或者功能残缺。
@@ -17,9 +18,8 @@ P2P Group Client：简称GC，组协商成为Station的P2P Device称为P2P GC
 
 # 流程图
 
-首先，来看一下Wi-Fi Direct连接的详细流程，下面这张图涵盖了Wi-Fi Direct的大部分功能，包括设备的发现、组协调、认证关联、WPS以及4次握手。（点击图片可以查看大图 :)）
-
-
+首先，来看一下Wi-Fi Direct连接的详细流程，下面这张图涵盖了Wi-Fi Direct的大部分功能，包括设备的发现、组协调、认证关联、WPS以及4次握手。
+![wifi direct](/images/wifi_direct/wifi_direct.jpg)
 
 # 设备发现
 
@@ -32,11 +32,11 @@ P2P Group Client：简称GC，组协商成为Station的P2P Device称为P2P GC
 # GO协商
 
 发现对方后，下一步就点击进行连接，而连接的第一步要确认各自的角色：谁做GO，谁做GC。Wi-Fi Direct通过增加Action帧的交互来达到此目的，这个交互非常简单，如下图如示：
-
+![group formation](/images/wifi_direct/group_formation.jpg)
 
 
 GO协商共包含三个类型的Action帧：GO Req、GO Resp、GO Confirm。GO Req和GO Resp包含GO Intent的IE，是一个0到15的整数值，通过这两个值的大小来确定GO，具体方法如下图。如果Intent不相等时，谁大谁做GO；如果相等时且小于15时，根据GO Req的随机数Tie Breaker来决定，Tie Break为1就自己做GO，否则对方做GO；如果相等且等于15，GO协商失败，这种情况说明A和B都必须成为GO，谁也不能妥协，那么只能以失败告终。
-
+![group formation](/images/wifi_direct/go_determination.jpg)
 
 
 事实上，一般情况下GO协商会有5个帧交互，P2P流程图已经清晰的展现出来了，一开始会让人比较迷惑，下面举例说明。假设有两个P2P设备A（Listen信道为1）和B（Listen信道为11），在A的P2P界面点击B进行连接，这时A首先会在11信道发送GO Req，发送需要持续一段时间，因为B可能会处于Search状态，所以持续的时间至少要大于B的Search时间；直到B切换为Listen状态，才能收到 GO Req，收到后立即在11信道回复GO Resp并给上层应用发送对应消息，应用提示用户是否同意A的连接。注意B刚刚回复的GO Resp包含的状态是fail:information is unavailable，A收到这个消息后不做任何动作，继续等待。直到用户点击B的同意后，B会再发起GO Req，由于A是连接发起方，他不用再去提醒用户同意，直接响应成功的GO Resp。最后B通过GO Confirm确认GO协商结束。
@@ -47,7 +47,7 @@ Wi-Fi Direct采用WPS PBC方式来协商密钥，我们知道当手机和AP进�
 
 Wi-Fi Direct省去了WPS按键流程，协商为GO的P2P设备转换为GO状态时自动在Beacon帧里增加PBC标志，GC也自动启动WPS连接流程。这里隐藏着一个问题，如果当前环境有AP刚好处于PBC状态或者当前有多组P2P设备在连接，那么很有可能GC扫描到的AP列表里有一个以上的AP包含PBC标志，引起PBC Overlap异常，导致P2P连接失败。这个问题概率很小，但使用WPS方式的设备都会存在，需要引起重视，当然P2P可以根据之前GO协商的MAC地址进行区分来避免。
 
-4次握手
+# 4次握手
 
 WPS流程只是协商出一个公共的Key，这个Key还不能用于数据加密。4次握手的作用是以公共Key为参数协商出PTK和GTK，之后进行加密数据传输。
 

@@ -2,6 +2,7 @@
 title: Wi-Fi Direct 简介
 date: 2016-12-22 05:42:58
 tags:
+categories: wifi
 ---
 
 Wi-Fi Direct技术是由WFA（Wi-Fi联盟）在2009年提出，目前最新的规范是v1.2版本。这个技术的目的是在没有Wi-Fi AP的情况下由两个或者多个Wi-Fi设备互相之间进行高速的数据通信。通信完全基于TCP/IP 协议，因此对于开发基于Wi-Fi Direct的应用来说非常友好。
